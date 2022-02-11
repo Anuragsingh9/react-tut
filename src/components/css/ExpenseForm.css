@@ -13,6 +13,8 @@
     margin-bottom: 1rem;
     text-align: left;
     padding: 10px 0 0 10px;
+    margin: auto;
+    text-align: center;
   }
   
   .new-expense__control label {

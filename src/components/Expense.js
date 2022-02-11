@@ -10,17 +10,37 @@ const Expense = (props) => {
   const filteredExpenses = props.item.filter(expense => {
     return expense.date.getFullYear().toString() === filteredYear;
   })
+  let expensesContent = <div className="no-data"><p>No expenses found.</p></div>
+  if (filteredExpenses.length > 0) {
+    expensesContent = filteredExpenses.map((expenses) => (
+      <ExpenseItem 
+      key ={expenses.id}
+      title = {expenses.title}
+      amount={expenses.amount}
+      date={expenses.date}
+      />
+    ))
+  }
     return <div>
       <ExpenseFilter selected={filteredYear} onChangeFilter={filterChangeHandler}/>
-      {filteredExpenses.map((expenses) => (
-        <ExpenseItem 
-        key ={expenses.id}
-        title = {expenses.title}
-        amount={expenses.amount}
-        date={expenses.date}
-        />
-      ))}
-      
+      {expensesContent}
+
+      {/* /* Other ways of loading components conditionaly are below one */ }
+
+      {/* {filteredExpenses.length === 0 && <p>No Expense data was found.</p>}
+
+      {filteredExpenses.length > 0 && (expensesContent = filteredExpenses.map((expenses) => (
+      <ExpenseItem 
+      key ={expenses.id}
+      title = {expenses.title}
+      amount={expenses.amount}
+      date={expenses.date}
+      />
+    )))} */}
+
+
+
+
       {/* <ExpenseItem
       title={props.item[0].title}
       amount={props.item[0].amount}
