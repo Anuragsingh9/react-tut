@@ -1,17 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ExpenseItem from "./ExpensesItem";
 import ExpenseFilter from "./ExpenseFilter";
+import ExpensesList from "./ExpensesList";
+import ExpensesChart from "./ExpensesChart";
 const Expense = (props) => {
-  const [filteredYear, setFilteredYear] = useState('2020');
-  const filterChangeHandler = selectedYear => {
-    setFilteredYear(selectedYear);
-    console.log(selectedYear);
+  const [filteredYear, setFilteredYear] = useState('2022');
+  const [searchedKey, setSearchTitle] = useState('');
+  const [filterComp, setFilteredComp] = useState('less');
+  const [savedExpenses,setSavedExpenses] = useState(0);
+  
+  const crossBtnHandler = (uniId) => {
+    props.crossBtnClicked(uniId);
+    }
+  
+  const keyChangeHandler = searchKey => {
+    setSearchTitle(searchKey);
   };
+
+  
+  const filterChangeHandler = selectedValue => {
+    const comparison = ['less','greater'];
+    if(comparison.includes(selectedValue)){
+      console.log(selectedValue + 'string');
+      setFilteredComp(selectedValue)
+    }else{
+      console.log(selectedValue + 'number');
+      setFilteredYear(selectedValue);
+    }
+  };
+  const savedExp = (props) =>{
+    console.log('ll ' + (filteredYear - 1))
+  let saved = 0;
+    props.item.filter(expense => {
+        if(expense.date.getFullYear().toString() == (filteredYear - 1)){
+          saved += expense.amount;
+        }
+    });
+    console.log('save ' + saved);
+    return saved;
+  } 
+
+  
+  
+  
   const filteredExpenses = props.item.filter(expense => {
-    return expense.date.getFullYear().toString() === filteredYear;
-  })
+    const getFilterExpenses = () => {
+      const exp =  (expense.title.includes(searchedKey) && expense.date.getFullYear().toString() === filteredYear 
+      && (filterComp == 'less' ? expense.amount <= 100 : expense.amount >= 100 && expense.date.getFullYear().toString() === filteredYear))
+      return exp;
+    }
+    
+    
+    const comparison = ['less','greater'];
+    if(searchedKey.trim().length > 0){
+      return getFilterExpenses();
+    }else if(comparison.includes(filterComp)){
+       if(filterComp === 'less'){
+        return getFilterExpenses();
+       }
+       return getFilterExpenses();
+    }
+    else{
+    return getFilterExpenses();
+  };
+  });
+
   let expensesContent = <div className="no-data"><p>No expenses found.</p></div>
   if (filteredExpenses.length > 0) {
+    // if(deleteId){
+    //   console.log('delllll ' + deleteId)
+    //   let index = filteredExpenses.findIndex(x => x.id === deleteId)
+    //   filteredExpenses.splice(index, 1);
+      
+    // }
+    // setDeleteId('');
+    console.log('cccccc ' + filteredExpenses);
     expensesContent = filteredExpenses.map((expenses) => (
       <ExpenseItem 
       key ={expenses.id}
@@ -21,9 +84,11 @@ const Expense = (props) => {
       />
     ))
   }
+  
     return <div>
-      <ExpenseFilter selected={filteredYear} onChangeFilter={filterChangeHandler}/>
-      {expensesContent}
+      <ExpenseFilter selected={filteredYear}  selectedComp={filterComp} monthlysaved={props.monthlySaved} lastExpense={savedExp(props)} onKeyChange={keyChangeHandler} onChangeFilter={filterChangeHandler}/>
+      <ExpensesChart expenses={filteredExpenses}/>
+      <ExpensesList item={filteredExpenses} onClickCrossBtn={crossBtnHandler}/>
 
       {/* /* Other ways of loading components conditionaly are below one */ }
 
